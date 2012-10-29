@@ -28,8 +28,10 @@ class PadBuster(PaddingOracle):
 
         if response.ok:
             logging.debug('No padding exception raised on %r', cookie)
+            return
 
         raise BadPaddingException
+
 
 if __name__ == '__main__':
     import logging
