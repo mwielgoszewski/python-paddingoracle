@@ -11,9 +11,8 @@ Usage:
 
 To use the paddingoracle API, simply implement the **oracle()** method from the
 PaddingOracle API and raise a **BadPaddingException** when the decrypter
-reveals a padding oracle. To decrypt data, pass raw encrypted bytes as a
-`bytearray <http://docs.python.org/2/library/functions.html#bytearray>`_ to 
-**decrypt()**.
+reveals a padding oracle. To decrypt data, pass raw encrypted bytes to
+**decrypt()** with a block size (typically 8 or 16) and optional iv parameter.
 
 See below for an example (from `the example`_): ::
 
