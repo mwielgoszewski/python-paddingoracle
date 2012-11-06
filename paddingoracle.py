@@ -3,7 +3,6 @@
 Padding Oracle Exploit API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 '''
-
 from itertools import izip, cycle
 import logging
 
@@ -223,13 +222,11 @@ def test():
 
     class PadBuster(PaddingOracle):
         def oracle(self, ctext):
-            import struct
-
             cipher = AES.new(key, AES.MODE_CBC, str(bytearray(AES.block_size)))
             ptext = cipher.decrypt(str(ctext))
-            plen = struct.unpack("B", ptext[-1])[0]
+            plen = ord(ptext[-1])
 
-            padding_is_good = (ptext[-plen:] == struct.pack("B", plen) * plen)
+            padding_is_good = (ptext[-plen:] == chr(plen) * plen)
 
             if padding_is_good:
                 return
