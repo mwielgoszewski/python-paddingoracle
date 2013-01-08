@@ -5,3 +5,5 @@ env
 dist
 docs/_build
 *.egg-info
+.buildinfo
+objects.inv
