@@ -19,6 +19,11 @@ class PaddingOracle(object):
     '''
     Implementations should subclass this object and implement
     the :meth:`oracle` method.
+
+    :param max_retries: Number of attempts per byte to reveal a
+        padding oracle, default is 3. If an oracle does not reveal
+        itself within `max_retries`, a :exception:`RuntimeError` is
+        raised.
     '''
 
     def __init__(self, **kwargs):
