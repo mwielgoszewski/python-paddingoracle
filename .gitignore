@@ -1,1 +1,4 @@
 *.pyc
+docs
+.buildinfo
+objects.inv
