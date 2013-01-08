@@ -6,6 +6,11 @@ Padding Oracle Exploit API
 from itertools import izip, cycle
 import logging
 
+__all__ = [
+    'BadPaddingException',
+    'PaddingOracle',
+    ]
+
 
 class BadPaddingException(Exception):
     '''
@@ -20,10 +25,9 @@ class PaddingOracle(object):
     Implementations should subclass this object and implement
     the :meth:`oracle` method.
 
-    :param max_retries: Number of attempts per byte to reveal a
+    :param int max_retries: Number of attempts per byte to reveal a
         padding oracle, default is 3. If an oracle does not reveal
-        itself within `max_retries`, a :exception:`RuntimeError` is
-        raised.
+        itself within `max_retries`, a :exc:`RuntimeError` is raised.
     '''
 
     def __init__(self, **kwargs):
@@ -38,14 +42,15 @@ class PaddingOracle(object):
         '''
         Feeds *data* to a decryption function that reveals a Padding
         Oracle. If a Padding Oracle was revealed, this method
-        should raise a :class:`.BadPaddingException`, otherwise this
-        method should just return.  A history of all responses should be
-        stored in :attribute:`history`, regardless
-        of whether they revealed a Padding Oracle or not.  Responses
-        from :attribute:`history` are fed to
-        :meth:`analyze` to help identify padding oracles.
+        should raise a :exc:`.BadPaddingException`, otherwise this
+        method should just return.
+        
+        A history of all responses should be stored in :attr:`~.history`,
+        regardless of whether they revealed a Padding Oracle or not.
+        Responses from :attr:`~.history` are fed to :meth:`analyze` to
+        help identify padding oracles.
 
-        :param data: A bytearray of (fuzzed) encrypted bytes.
+        :param bytearray data: A bytearray of (fuzzed) encrypted bytes.
         :raises: :class:`BadPaddingException` if decryption reveals an
             oracle.
         '''
@@ -54,7 +59,7 @@ class PaddingOracle(object):
     def analyze(self):
         '''
         This method analyzes return :meth:`oracle` values stored in
-        :attribute:`history` and returns the most likely
+        :attr:`~.history` and returns the most likely
         candidate(s) that reveals a padding oracle.
         '''
         raise NotImplementedError
@@ -64,7 +69,7 @@ class PaddingOracle(object):
         Encrypts *plaintext* by exploiting a Padding Oracle.
 
         :param plaintext: Plaintext data to encrypt.
-        :param block_size: Cipher block size (in bytes).
+        :param int block_size: Cipher block size (in bytes).
         :param iv: The initialization vector (iv), usually the first
             *block_size* bytes from the ciphertext. If no iv is given
             or iv is None, the first *block_size* bytes will be null's.
@@ -101,7 +106,7 @@ class PaddingOracle(object):
         Decrypts *ciphertext* by exploiting a Padding Oracle.
 
         :param ciphertext: Encrypted data.
-        :param block_size: Cipher block size (in bytes).
+        :param int block_size: Cipher block size (in bytes).
         :param iv: The initialization vector (iv), usually the first
             *block_size* bytes from the ciphertext. If no iv is given
             or iv is None, the first *block_size* bytes will be used.
@@ -150,7 +155,7 @@ class PaddingOracle(object):
         :meth:`decrypt`.
 
         :param block:
-        :param block_size:
+        :param int block_size: Cipher block size (in bytes).
         :returns: A bytearray containing the decrypted bytes
         '''
         intermediate_bytes = bytearray()
