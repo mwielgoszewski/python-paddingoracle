@@ -54,14 +54,14 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <span class="target" id="module-paddingoracle"><span id="api"></span></span><div class="section" id="developer-interface">
-<h1>Developer Interface<a class="headerlink" href="#developer-interface" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-paddingoracle">
+<span id="developer-interface"></span><span id="api"></span><h1>Developer Interface<a class="headerlink" href="#module-paddingoracle" title="Permalink to this headline">¶</a></h1>
 <p>This part of the documentation covers all the interfaces exposed by the
 Padding Oracle Exploit API.</p>
 <div class="section" id="main-interface">
 <h2>Main Interface<a class="headerlink" href="#main-interface" title="Permalink to this headline">¶</a></h2>
-<p>Tool authors should subclass the <a class="reference internal" href="#paddingoracle.PaddingOracle" title="paddingoracle.PaddingOracle"><tt class="xref py py-class docutils literal"><span class="pre">PaddingOracle</span></tt></a> class and implement
-<a class="reference internal" href="#paddingoracle.PaddingOracle.oracle" title="paddingoracle.PaddingOracle.oracle"><tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt></a>.  A typical example may look like:</p>
+<p>Tool authors should subclass the <a class="reference internal" href="#paddingoracle.PaddingOracle" title="paddingoracle.PaddingOracle"><tt class="xref py py-class docutils literal"><span class="pre">PaddingOracle</span></tt></a> class and implement <tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt>.
+A typical example may look like:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paddingoracle</span> <span class="kn">import</span> <span class="n">PaddingOracle</span><span class="p">,</span> <span class="n">BadPaddingException</span>
 
 <span class="k">class</span> <span class="nc">PadBuster</span><span class="p">(</span><span class="n">PaddingOracle</span><span class="p">):</span>

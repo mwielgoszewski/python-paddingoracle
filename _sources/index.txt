@@ -1,5 +1,5 @@
-.. python-paddingoracle documentation master file, created by
-   sphinx-quickstart on Tue Jan  8 10:42:27 2013.
+.. Padding Oracle Exploit API documentation master file, created by
+   sphinx-quickstart on Tue Jan  8 14:35:03 2013.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -11,17 +11,17 @@ alternative to `PadBuster`_ and other padding oracle exploit tools that can't
 easily (without a heavy rewrite) be used in unique, per-app scenarios. Think
 non-HTTP applications, raw sockets, client applications, unique encodings, etc.
 
-.. module:: paddingoracle
-
 
 Usage
 -----
 
-To use the paddingoracle API, simply implement the
-:meth:`~PaddingOracle.oracle()` method from the :class:`PaddingOracle` API and
-raise a :exc:`BadPaddingException` when the decrypter reveals a padding oracle.
-To decrypt data, pass raw encrypted bytes to :meth:`~PaddingOracle.decrypt()`
-with a **block_size** (typically 8 or 16) and optional **iv** parameter.
+.. module:: paddingoracle
+
+To use the paddingoracle API, simply implement the :meth:`~PaddingOracle.oracle`
+method from the :class:`PaddingOracle` API and raise a :exc:`BadPaddingException`
+when the decrypter reveals a padding oracle. To decrypt data, pass raw encrypted
+bytes to :meth:`~PaddingOracle.decrypt` with a **block_size** (typically 8 or 16)
+and optional **iv** parameter.
 
 See below for an example (from `the example`_): ::
 
@@ -34,7 +34,7 @@ See below for an example (from `the example`_): ::
 
     class PadBuster(PaddingOracle):
         def __init__(self, **kwargs):
-            PaddingOracle.__init__(self, **kwargs)
+            super(PadBuster, self).__init__(**kwargs)
             self.session = requests.session(prefetch=True, timeout=5, verify=False)
 
         def oracle(self, data):

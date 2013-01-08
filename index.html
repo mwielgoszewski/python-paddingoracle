@@ -60,13 +60,13 @@
 alternative to <a class="reference external" href="https://github.com/GDSSecurity/PadBuster">PadBuster</a> and other padding oracle exploit tools that can&#8217;t
 easily (without a heavy rewrite) be used in unique, per-app scenarios. Think
 non-HTTP applications, raw sockets, client applications, unique encodings, etc.</p>
-<span class="target" id="module-paddingoracle"></span><div class="section" id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>To use the paddingoracle API, simply implement the
-<a class="reference internal" href="api.html#paddingoracle.PaddingOracle.oracle" title="paddingoracle.PaddingOracle.oracle"><tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt></a> method from the <a class="reference internal" href="api.html#paddingoracle.PaddingOracle" title="paddingoracle.PaddingOracle"><tt class="xref py py-class docutils literal"><span class="pre">PaddingOracle</span></tt></a> API and
-raise a <a class="reference internal" href="api.html#paddingoracle.BadPaddingException" title="paddingoracle.BadPaddingException"><tt class="xref py py-exc docutils literal"><span class="pre">BadPaddingException</span></tt></a> when the decrypter reveals a padding oracle.
-To decrypt data, pass raw encrypted bytes to <a class="reference internal" href="api.html#paddingoracle.PaddingOracle.decrypt" title="paddingoracle.PaddingOracle.decrypt"><tt class="xref py py-meth docutils literal"><span class="pre">decrypt()</span></tt></a>
-with a <strong>block_size</strong> (typically 8 or 16) and optional <strong>iv</strong> parameter.</p>
+<div class="section" id="module-paddingoracle">
+<span id="usage"></span><h2>Usage<a class="headerlink" href="#module-paddingoracle" title="Permalink to this headline">¶</a></h2>
+<p>To use the paddingoracle API, simply implement the <a class="reference internal" href="api.html#paddingoracle.PaddingOracle.oracle" title="paddingoracle.PaddingOracle.oracle"><tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt></a>
+method from the <a class="reference internal" href="api.html#paddingoracle.PaddingOracle" title="paddingoracle.PaddingOracle"><tt class="xref py py-class docutils literal"><span class="pre">PaddingOracle</span></tt></a> API and raise a <a class="reference internal" href="api.html#paddingoracle.BadPaddingException" title="paddingoracle.BadPaddingException"><tt class="xref py py-exc docutils literal"><span class="pre">BadPaddingException</span></tt></a>
+when the decrypter reveals a padding oracle. To decrypt data, pass raw encrypted
+bytes to <a class="reference internal" href="api.html#paddingoracle.PaddingOracle.decrypt" title="paddingoracle.PaddingOracle.decrypt"><tt class="xref py py-meth docutils literal"><span class="pre">decrypt()</span></tt></a> with a <strong>block_size</strong> (typically 8 or 16)
+and optional <strong>iv</strong> parameter.</p>
 <p>See below for an example (from <a class="reference external" href="https://github.com/mwielgoszewski/python-paddingoracle/blob/master/example.py">the example</a>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paddingoracle</span> <span class="kn">import</span> <span class="n">BadPaddingException</span><span class="p">,</span> <span class="n">PaddingOracle</span>
 <span class="kn">from</span> <span class="nn">base64</span> <span class="kn">import</span> <span class="n">b64encode</span><span class="p">,</span> <span class="n">b64decode</span>
@@ -77,7 +77,7 @@ with a <strong>block_size</strong> (typically 8 or 16) and optional <strong>iv</
 
 <span class="k">class</span> <span class="nc">PadBuster</span><span class="p">(</span><span class="n">PaddingOracle</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">PaddingOracle</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PadBuster</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">prefetch</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">oracle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -150,7 +150,7 @@ Brian Holyfield of Gotham Digital Science.</p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Padding Oracle Exploit API</a><ul>
-<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#module-paddingoracle">Usage</a></li>
 <li><a class="reference internal" href="#api-documentation">API Documentation</a><ul>
 </ul>
 </li>
