@@ -9,7 +9,7 @@ import time
 
 class PadBuster(PaddingOracle):
     def __init__(self, **kwargs):
-        PaddingOracle.__init__(self, **kwargs)
+        super(PadBuster, self).__init__(**kwargs)
         self.session = requests.session(prefetch=True, timeout=5, verify=False)
 
     def oracle(self, data):

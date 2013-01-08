@@ -25,7 +25,7 @@ See below for an example (from `the example`_): ::
 
     class PadBuster(PaddingOracle):
         def __init__(self, **kwargs):
-            PaddingOracle.__init__(self, **kwargs)
+            super(PadBuster, self).__init__(**kwargs)
             self.session = requests.session(prefetch=True, timeout=5, verify=False)
 
         def oracle(self, data):
@@ -76,4 +76,3 @@ Brian Holyfield of Gotham Digital Science.
 
 .. _`the example`: https://github.com/mwielgoszewski/python-paddingoracle/blob/master/example.py
 .. _`PadBuster`: https://github.com/GDSSecurity/PadBuster
-
