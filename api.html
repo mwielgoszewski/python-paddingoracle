@@ -60,8 +60,8 @@
 Padding Oracle Exploit API.</p>
 <div class="section" id="main-interface">
 <h2>Main Interface<a class="headerlink" href="#main-interface" title="Permalink to this headline">¶</a></h2>
-<p>Tool authors should subclass the <a class="reference internal" href="#paddingoracle.PaddingOracle" title="paddingoracle.PaddingOracle"><tt class="xref py py-class docutils literal"><span class="pre">PaddingOracle</span></tt></a> class and implement <tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt>.
-A typical example may look like:</p>
+<p>Tool authors should subclass the <a class="reference internal" href="#paddingoracle.PaddingOracle" title="paddingoracle.PaddingOracle"><tt class="xref py py-class docutils literal"><span class="pre">PaddingOracle</span></tt></a> class and implement
+<tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt>. A typical example may look like:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">paddingoracle</span> <span class="kn">import</span> <span class="n">PaddingOracle</span><span class="p">,</span> <span class="n">BadPaddingException</span>
 
 <span class="k">class</span> <span class="nc">PadBuster</span><span class="p">(</span><span class="n">PaddingOracle</span><span class="p">):</span>
@@ -75,6 +75,16 @@ A typical example may look like:</p>
         <span class="k">raise</span> <span class="n">BadPaddingException</span>
 </pre></div>
 </div>
+<p>To exploit the padding oracle vulnerability, simply:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">padbuster</span> <span class="o">=</span> <span class="n">PadBuster</span><span class="p">()</span>
+<span class="n">decrypted</span> <span class="o">=</span> <span class="n">padbuster</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">decrypted</span>
+</pre></div>
+</div>
+<p>That&#8217;s all!  The hard work of actually carrying out the attack is handled
+in the <tt class="xref py py-meth docutils literal"><span class="pre">PaddingOracle.bust()</span></tt> method (not documented), which in turns
+calls the <a class="reference internal" href="#paddingoracle.PaddingOracle.oracle" title="paddingoracle.PaddingOracle.oracle"><tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt></a> method implemented by your code.</p>
 <dl class="class">
 <dt id="paddingoracle.PaddingOracle">
 <em class="property">class </em><tt class="descclassname">paddingoracle.</tt><tt class="descname">PaddingOracle</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle" title="Permalink to this definition">¶</a></dt>
