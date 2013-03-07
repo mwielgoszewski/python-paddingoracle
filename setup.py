@@ -8,7 +8,7 @@ setup(
     name='paddingoracle',
     author='Marcin Wielgoszewski',
     author_email='marcin.wielgoszewski@gmail.com',
-    version='0.1',
+    version='0.2',
     url='https://github.com/mwielgoszewski/python-paddingoracle',
     py_modules=['paddingoracle'],
     description='A portable, padding oracle exploit API',
