@@ -11,6 +11,7 @@ class PadBuster(PaddingOracle):
     def __init__(self, **kwargs):
         super(PadBuster, self).__init__(**kwargs)
         self.session = requests.Session()
+        self.wait = kwargs.get('wait', 2.0)
 
     def oracle(self, data, **kwargs):
         somecookie = quote(b64encode(data))
@@ -22,7 +23,9 @@ class PadBuster(PaddingOracle):
                         stream=False, timeout=5, verify=False)
                 break
             except (socket.error, requests.exceptions.RequestException):
-                time.sleep(2)
+                logging.exception('Retrying request in %.2f seconds...',
+                                  self.wait)
+                time.sleep(self.wait)
                 continue
 
         self.history.append(response)
