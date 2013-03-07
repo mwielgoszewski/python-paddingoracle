@@ -38,7 +38,7 @@ class PaddingOracle(object):
         self._decrypted = None
         self._encrypted = None
 
-    def oracle(self, data):
+    def oracle(self, data, **kwargs):
         '''
         Feeds *data* to a decryption function that reveals a Padding
         Oracle. If a Padding Oracle was revealed, this method
@@ -56,7 +56,7 @@ class PaddingOracle(object):
         '''
         raise NotImplementedError
 
-    def analyze(self):
+    def analyze(self, **kwargs):
         '''
         This method analyzes return :meth:`oracle` values stored in
         :attr:`~.history` and returns the most likely
@@ -64,7 +64,7 @@ class PaddingOracle(object):
         '''
         raise NotImplementedError
 
-    def encrypt(self, plaintext, block_size=8, iv=None):
+    def encrypt(self, plaintext, block_size=8, iv=None, **kwargs):
         '''
         Encrypts *plaintext* by exploiting a Padding Oracle.
 
@@ -90,10 +90,11 @@ class PaddingOracle(object):
 
         n = len(plaintext + iv)
         while n > 0:
-            intermediate_bytes = self.bust(block, block_size=block_size)
+            intermediate_bytes = self.bust(block, block_size=block_size,
+                                           **kwargs)
 
             block = xor(intermediate_bytes,
-                               plaintext[n - block_size * 2:n + block_size])
+                        plaintext[n - block_size * 2:n + block_size])
 
             encrypted = block + encrypted
 
@@ -101,7 +102,7 @@ class PaddingOracle(object):
 
         return encrypted
 
-    def decrypt(self, ciphertext, block_size=8, iv=None):
+    def decrypt(self, ciphertext, block_size=8, iv=None, **kwargs):
         '''
         Decrypts *ciphertext* by exploiting a Padding Oracle.
 
@@ -130,7 +131,8 @@ class PaddingOracle(object):
         while ctext:
             block, ctext = ctext[:block_size], ctext[block_size:]
 
-            intermediate_bytes = self.bust(block, block_size=block_size)
+            intermediate_bytes = self.bust(block, block_size=block_size,
+                                           **kwargs)
 
             # XOR the intermediate bytes with the the previous block (iv)
             # to get the plaintext
@@ -148,7 +150,7 @@ class PaddingOracle(object):
 
         return decrypted
 
-    def bust(self, block, block_size=8):
+    def bust(self, block, block_size=8, **kwargs):
         '''
         A block buster. This method busts one ciphertext block at a time.
         This method should not be called directly, instead use
@@ -192,7 +194,7 @@ class PaddingOracle(object):
 
                     try:
                         self.attempts += 1
-                        self.oracle(test_bytes[:])
+                        self.oracle(test_bytes[:], **kwargs)
                     except BadPaddingException:
 
                         # TODO
