@@ -27,7 +27,7 @@ class PadBuster(PaddingOracle):
         self.history.append(response)
 
         if response.ok:
-            logging.debug('No padding exception raised on %r', cookie)
+            logging.debug('No padding exception raised on %r', somecookie)
             return
 
         raise BadPaddingException

@@ -52,7 +52,7 @@ See below for an example (from `the example`_): ::
             self.history.append(response)
 
             if response.ok:
-                logging.debug('No padding exception raised on %r', cookie)
+                logging.debug('No padding exception raised on %r', somecookie)
                 return
 
             # An HTTP 500 error was returned, likely due to incorrect padding
