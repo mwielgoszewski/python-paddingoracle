@@ -102,7 +102,7 @@ itself within <cite>max_retries</cite>, a <tt class="xref py py-exc docutils lit
 </table>
 <dl class="method">
 <dt id="paddingoracle.PaddingOracle.decrypt">
-<tt class="descname">decrypt</tt><big>(</big><em>ciphertext</em>, <em>block_size=8</em>, <em>iv=None</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.decrypt" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">decrypt</tt><big>(</big><em>ciphertext</em>, <em>block_size=8</em>, <em>iv=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.decrypt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decrypts <em>ciphertext</em> by exploiting a Padding Oracle.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -126,7 +126,7 @@ or iv is None, the first <em>block_size</em> bytes will be used.</li>
 
 <dl class="method">
 <dt id="paddingoracle.PaddingOracle.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>plaintext</em>, <em>block_size=8</em>, <em>iv=None</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.encrypt" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">encrypt</tt><big>(</big><em>plaintext</em>, <em>block_size=8</em>, <em>iv=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.encrypt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encrypts <em>plaintext</em> by exploiting a Padding Oracle.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -150,7 +150,7 @@ or iv is None, the first <em>block_size</em> bytes will be null&#8217;s.</li>
 
 <dl class="method">
 <dt id="paddingoracle.PaddingOracle.oracle">
-<tt class="descname">oracle</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.oracle" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">oracle</tt><big>(</big><em>data</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.oracle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Feeds <em>data</em> to a decryption function that reveals a Padding
 Oracle. If a Padding Oracle was revealed, this method
 should raise a <a class="reference internal" href="#paddingoracle.BadPaddingException" title="paddingoracle.BadPaddingException"><tt class="xref py py-exc docutils literal"><span class="pre">BadPaddingException</span></tt></a>, otherwise this
@@ -174,7 +174,7 @@ oracle.</td>
 
 <dl class="method">
 <dt id="paddingoracle.PaddingOracle.analyze">
-<tt class="descname">analyze</tt><big>(</big><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.analyze" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">analyze</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#paddingoracle.PaddingOracle.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method analyzes return <a class="reference internal" href="#paddingoracle.PaddingOracle.oracle" title="paddingoracle.PaddingOracle.oracle"><tt class="xref py py-meth docutils literal"><span class="pre">oracle()</span></tt></a> values stored in
 <tt class="xref py py-attr docutils literal"><span class="pre">history</span></tt> and returns the most likely
 candidate(s) that reveals a padding oracle.</p>
