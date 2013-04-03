@@ -44,7 +44,7 @@ class PaddingOracle(object):
         Oracle. If a Padding Oracle was revealed, this method
         should raise a :exc:`.BadPaddingException`, otherwise this
         method should just return.
-        
+
         A history of all responses should be stored in :attr:`~.history`,
         regardless of whether they revealed a Padding Oracle or not.
         Responses from :attr:`~.history` are fed to :meth:`analyze` to
