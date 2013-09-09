@@ -73,7 +73,7 @@ class PaddingOracle(object):
         :param iv: The initialization vector (iv), usually the first
             *block_size* bytes from the ciphertext. If no iv is given
             or iv is None, the first *block_size* bytes will be null's.
-        :returns: Decrypted data.
+        :returns: Encrypted data.
         '''
         pad = block_size - (len(plaintext) % block_size)
         plaintext = bytearray(plaintext + chr(pad) * pad)
