@@ -182,7 +182,7 @@ class PaddingOracle(object):
             # trying until we exceed the max retry attempts (default is 3)
 
             while retries < self.max_retries and not successful:
-                for i in reversed(xrange(255)):
+                for i in reversed(xrange(256)):
 
                     # Fuzz the test byte
 
