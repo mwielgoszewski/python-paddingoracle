@@ -259,10 +259,15 @@ def xor(data, key):
 
 def test():
     import os
-    from M2Crypto.util import pkcs7_pad
     from Crypto.Cipher import AES
 
     teststring = 'The quick brown fox jumped over the lazy dog'
+
+    def pkcs7_pad(data, blklen=16):
+        if blklen > 255:
+            raise ValueError('Illegal block size %d' % (blklen, ))
+        pad = (blklen - (len(data) % blklen))
+        return data + chr(pad) * pad
 
     class PadBuster(PaddingOracle):
         def oracle(self, data):
