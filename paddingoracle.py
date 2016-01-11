@@ -245,7 +245,7 @@ class PaddingOracle(object):
                     break
 
                 else:
-                    self.log.debug("byte %d not found, restarting")
+                    self.log.debug("byte %d not found, restarting" % byte_num)
                     retries += 1
 
                     break
