@@ -294,46 +294,49 @@ def test():
 
     padbuster = PadBuster()
 
-    key = os.urandom(AES.block_size)
-    iv = bytearray(os.urandom(AES.block_size))
+    for _ in xrange(100):
+        key = os.urandom(AES.block_size)
+        iv = bytearray(os.urandom(AES.block_size))
 
-    print "Testing padding oracle exploit in DECRYPT mode"
-    cipher = AES.new(key, AES.MODE_CBC, str(iv))
+        print "Testing padding oracle exploit in DECRYPT mode"
+        cipher = AES.new(key, AES.MODE_CBC, str(iv))
 
-    data = pkcs7_pad(teststring, blklen=AES.block_size)
-    ctext = cipher.encrypt(data)
+        data = pkcs7_pad(teststring, blklen=AES.block_size)
+        ctext = cipher.encrypt(data)
 
-    decrypted = padbuster.decrypt(ctext, block_size=AES.block_size, iv=iv)
+        print "Key:        %r" % (key, )
+        print "IV:         %r" % (iv, )
+        print "Plaintext:  %r" % (data, )
+        print "Ciphertext: %r" % (ctext, )
 
-    print "Key:        %r" % (key, )
-    print "IV:         %r" % (iv, )
-    print "Plaintext:  %r" % (data, )
-    print "Ciphertext: %r" % (ctext, )
-    print "Decrypted:  %r" % (str(decrypted), )
-    print "\nRecovered in %d attempts\n" % (padbuster.attempts, )
+        decrypted = padbuster.decrypt(ctext, block_size=AES.block_size, iv=iv)
 
-    assert decrypted == data, \
-        'Decrypted data %r does not match original %r' % (
-            decrypted, data)
+        print "Decrypted:  %r" % (str(decrypted), )
+        print "\nRecovered in %d attempts\n" % (padbuster.attempts, )
 
-    print "Testing padding oracle exploit in ENCRYPT mode"
-    cipher2 = AES.new(key, AES.MODE_CBC, str(iv))
+        assert decrypted == data, \
+            'Decrypted data %r does not match original %r' % (
+                decrypted, data)
 
-    encrypted = padbuster.encrypt(teststring, block_size=AES.block_size)
+        print "Testing padding oracle exploit in ENCRYPT mode"
+        cipher2 = AES.new(key, AES.MODE_CBC, str(iv))
 
-    decrypted = cipher2.decrypt(str(encrypted))[AES.block_size:]
-    decrypted = decrypted.rstrip(decrypted[-1])
+        encrypted = padbuster.encrypt(teststring, block_size=AES.block_size)
 
-    print "Key:        %r" % (key, )
-    print "IV:         %r" % (iv, )
-    print "Plaintext:  %r" % (teststring, )
-    print "Ciphertext: %r" % (str(encrypted), )
-    print "Decrypted:  %r" % (str(decrypted), )
-    print "\nRecovered in %d attempts" % (padbuster.attempts, )
+        print "Key:        %r" % (key, )
+        print "IV:         %r" % (iv, )
+        print "Plaintext:  %r" % (teststring, )
+        print "Ciphertext: %r" % (str(encrypted), )
 
-    assert decrypted == teststring, \
-        'Encrypted data %r does not decrypt to %r, got %r' % (
-            encrypted, teststring, decrypted)
+        decrypted = cipher2.decrypt(str(encrypted))[AES.block_size:]
+        decrypted = decrypted.rstrip(decrypted[-1])
+
+        print "Decrypted:  %r" % (str(decrypted), )
+        print "\nRecovered in %d attempts" % (padbuster.attempts, )
+
+        assert decrypted == teststring, \
+            'Encrypted data %r does not decrypt to %r, got %r' % (
+                encrypted, teststring, decrypted)
 
 
 if __name__ == '__main__':
