@@ -180,10 +180,11 @@ class PaddingOracle(object):
 
                 self.history = []
 
-                # Break on first value that returns and oracle, otherwise if we
+                # Break on first value that returns an oracle, otherwise if we
                 # don't find a good value it means we have a false positive
-                # value for the last byte and we need to start all over again from the last byte.
-                # We can resume where we left off for the last byte though.
+                # value for the last byte and we need to start all over again
+                # from the last byte. We can resume where we left off for the
+                # last byte though.
 
                 r = 256
                 if byte_num == block_size-1 and last_ok > 0:
@@ -202,7 +203,9 @@ class PaddingOracle(object):
                     try:
                         self.attempts += 1
                         self.oracle(test_bytes[:], **kwargs)
-                        last_ok = i
+
+                        if byte_num == block_size-1:
+                            last_ok = i
 
                     except BadPaddingException:
 
