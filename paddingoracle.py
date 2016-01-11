@@ -160,29 +160,36 @@ class PaddingOracle(object):
         :param int block_size: Cipher block size (in bytes).
         :returns: A bytearray containing the decrypted bytes
         '''
-        intermediate_bytes = bytearray()
+        intermediate_bytes = bytearray(block_size)
 
         test_bytes = bytearray(block_size)  # '\x00\x00\x00\x00...'
         test_bytes.extend(block)
 
         self.log.debug('Processing block %r', str(block))
 
-        # Work on one byte at a time, starting with the last byte
-        # and moving backwards
+        retries = 0
+        last_ok = 0
+        while retries < self.max_retries:
 
-        for byte_num in reversed(xrange(block_size)):
-            retries = 0
-            successful = False
+            # Work on one byte at a time, starting with the last byte
+            # and moving backwards
 
-            # clear oracle history for each byte
+            for byte_num in reversed(xrange(block_size)):
 
-            self.history = []
+                # clear oracle history for each byte
 
-            # Break on first byte that returns an oracle, otherwise keep
-            # trying until we exceed the max retry attempts (default is 3)
+                self.history = []
 
-            while retries < self.max_retries and not successful:
-                for i in reversed(xrange(256)):
+                # Break on first value that returns and oracle, otherwise if we
+                # don't find a good value it means we have a false positive
+                # value for the last byte and we need to start all over again from the last byte.
+                # We can resume where we left off for the last byte though.
+
+                r = 256
+                if byte_num == block_size-1 and last_ok > 0:
+                    r = last_ok
+
+                for i in reversed(xrange(r)):
 
                     # Fuzz the test byte
 
@@ -195,6 +202,8 @@ class PaddingOracle(object):
                     try:
                         self.attempts += 1
                         self.oracle(test_bytes[:], **kwargs)
+                        last_ok = i
+
                     except BadPaddingException:
 
                         # TODO
@@ -215,13 +224,11 @@ class PaddingOracle(object):
                                            intermediate_bytes, self.__dict__)
                         raise
 
-                    successful = True
-
                     current_pad_byte = block_size - byte_num
                     next_pad_byte = block_size - byte_num + 1
                     decrypted_byte = test_bytes[byte_num] ^ current_pad_byte
 
-                    intermediate_bytes.insert(0, decrypted_byte)
+                    intermediate_bytes[byte_num] = decrypted_byte
 
                     for k in xrange(byte_num, block_size):
 
@@ -237,15 +244,18 @@ class PaddingOracle(object):
 
                     break
 
-                if successful:
-                    break
                 else:
+                    self.log.debug("byte %d not found, restarting")
                     retries += 1
 
+                    break
             else:
-                raise RuntimeError('Could not decrypt byte %d in %r within '
-                                   'maximum allotted retries (%d)' % (
-                                   byte_num, block, self.max_retries))
+                break
+
+        else:
+            raise RuntimeError('Could not decrypt byte %d in %r within '
+                               'maximum allotted retries (%d)' % (
+                               byte_num, block, self.max_retries))
 
         return intermediate_bytes
 
