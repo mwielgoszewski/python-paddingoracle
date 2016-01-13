@@ -187,7 +187,7 @@ class PaddingOracle(object):
                 # last byte though.
 
                 r = 256
-                if byte_num == block_size-1 and last_ok > 0:
+                if byte_num == block_size - 1 and last_ok > 0:
                     r = last_ok
 
                 for i in reversed(xrange(r)):
@@ -204,7 +204,7 @@ class PaddingOracle(object):
                         self.attempts += 1
                         self.oracle(test_bytes[:], **kwargs)
 
-                        if byte_num == block_size-1:
+                        if byte_num == block_size - 1:
                             last_ok = i
 
                     except BadPaddingException:
