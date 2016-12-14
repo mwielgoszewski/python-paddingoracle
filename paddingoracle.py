@@ -97,7 +97,9 @@ class PaddingOracle(object):
                         plaintext[n - block_size * 2:n + block_size])
 
             encrypted = block + encrypted
-
+            
+            self.log.debug('Encrypted block %d', n)
+            
             n -= block_size
 
         return encrypted
