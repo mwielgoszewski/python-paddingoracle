@@ -94,7 +94,7 @@ class PaddingOracle(object):
                                            **kwargs)
 
             block = xor(intermediate_bytes,
-                        plaintext[n - block_size * 2:n + block_size])
+                        plaintext[n - block_size * 2:n - block_size])
 
             encrypted = block + encrypted
 
