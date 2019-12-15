@@ -3,7 +3,9 @@
 Padding Oracle Exploit API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 '''
-from itertools import izip, cycle
+from __future__ import print_function
+from builtins import range
+from future.moves.itertools import filterfalse, zip_longest
 import logging
 
 __all__ = [
@@ -174,7 +176,7 @@ class PaddingOracle(object):
             # Work on one byte at a time, starting with the last byte
             # and moving backwards
 
-            for byte_num in reversed(xrange(block_size)):
+            for byte_num in reversed(range(block_size)):
 
                 # clear oracle history for each byte
 
@@ -190,7 +192,7 @@ class PaddingOracle(object):
                 if byte_num == block_size - 1 and last_ok > 0:
                     r = last_ok
 
-                for i in reversed(xrange(r)):
+                for i in reversed(range(r)):
 
                     # Fuzz the test byte
 
@@ -233,7 +235,7 @@ class PaddingOracle(object):
 
                     intermediate_bytes[byte_num] = decrypted_byte
 
-                    for k in xrange(byte_num, block_size):
+                    for k in range(byte_num, block_size):
 
                         # XOR the current test byte with the padding value
                         # for this round to recover the decrypted byte
@@ -297,45 +299,45 @@ def test():
 
     padbuster = PadBuster()
 
-    for _ in xrange(100):
+    for _ in range(100):
         key = os.urandom(AES.block_size)
         iv = bytearray(os.urandom(AES.block_size))
 
-        print "Testing padding oracle exploit in DECRYPT mode"
+        print("Testing padding oracle exploit in DECRYPT mode")
         cipher = AES.new(key, AES.MODE_CBC, str(iv))
 
         data = pkcs7_pad(teststring, blklen=AES.block_size)
         ctext = cipher.encrypt(data)
 
-        print "Key:        %r" % (key, )
-        print "IV:         %r" % (iv, )
-        print "Plaintext:  %r" % (data, )
-        print "Ciphertext: %r" % (ctext, )
+        print("Key:        %r" % (key, ))
+        print("IV:         %r" % (iv, ))
+        print("Plaintext:  %r" % (data, ))
+        print("Ciphertext: %r" % (ctext, ))
 
         decrypted = padbuster.decrypt(ctext, block_size=AES.block_size, iv=iv)
 
-        print "Decrypted:  %r" % (str(decrypted), )
-        print "\nRecovered in %d attempts\n" % (padbuster.attempts, )
+        print("Decrypted:  %r" % (str(decrypted), ))
+        print("\nRecovered in %d attempts\n" % (padbuster.attempts, ))
 
         assert decrypted == data, \
             'Decrypted data %r does not match original %r' % (
                 decrypted, data)
 
-        print "Testing padding oracle exploit in ENCRYPT mode"
+        print("Testing padding oracle exploit in ENCRYPT mode")
         cipher2 = AES.new(key, AES.MODE_CBC, str(iv))
 
         encrypted = padbuster.encrypt(teststring, block_size=AES.block_size)
 
-        print "Key:        %r" % (key, )
-        print "IV:         %r" % (iv, )
-        print "Plaintext:  %r" % (teststring, )
-        print "Ciphertext: %r" % (str(encrypted), )
+        print("Key:        %r" % (key, ))
+        print("IV:         %r" % (iv, ))
+        print("Plaintext:  %r" % (teststring, ))
+        print("Ciphertext: %r" % (str(encrypted), ))
 
         decrypted = cipher2.decrypt(str(encrypted))[AES.block_size:]
         decrypted = decrypted.rstrip(decrypted[-1])
 
-        print "Decrypted:  %r" % (str(decrypted), )
-        print "\nRecovered in %d attempts" % (padbuster.attempts, )
+        print("Decrypted:  %r" % (str(decrypted), ))
+        print("\nRecovered in %d attempts" % (padbuster.attempts, ))
 
         assert decrypted == teststring, \
             'Encrypted data %r does not decrypt to %r, got %r' % (
