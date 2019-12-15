@@ -6,6 +6,7 @@ Padding Oracle Exploit API
 from __future__ import print_function
 from builtins import range
 from future.moves.itertools import filterfalse, zip_longest
+import itertools as it
 import logging
 
 __all__ = [
@@ -269,7 +270,7 @@ def xor(data, key):
     '''
     XOR two bytearray objects with each other.
     '''
-    return bytearray([x ^ y for x, y in izip(data, cycle(key))])
+    return bytearray([x ^ y for x, y in zip(data, it.cycle(key))])
 
 
 def test():
