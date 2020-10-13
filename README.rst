@@ -1,6 +1,8 @@
 python-paddingoracle: A portable, padding oracle exploit API
 ============================================================
 
+UPDATED FOR PYTHON 3
+
 python-paddingoracle is an API that provides pentesters a customizable
 alternative to `PadBuster`_ and other padding oracle exploit tools that can't
 easily (without a heavy rewrite) be used in unique, per-app scenarios. Think

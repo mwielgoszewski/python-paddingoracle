@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from paddingoracle import BadPaddingException, PaddingOracle
 from base64 import b64encode, b64decode
-from urllib import quote, unquote
+from urllib.parse import quote, unquote
 import requests
 import socket
 import time
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     import sys
 
     if not sys.argv[1:]:
-        print 'Usage: %s <somecookie value>' % (sys.argv[0], )
+        print('Usage: %s <somecookie value>' % (sys.argv[0], ))
         sys.exit(1)
 
     logging.basicConfig(level=logging.DEBUG)
