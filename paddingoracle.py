@@ -78,7 +78,7 @@ class PaddingOracle(object):
         pad = block_size - (len(plaintext) % block_size)
         if isinstance(plaintext, str): # convert to bytes if its a string
             plaintext = plaintext.encode() + bytes([pad]) * pad
-        elif isinstance(plaintext, bytes):
+        elif isinstance(plaintext, (bytes, bytearray)):
             plaintext = plaintext + bytes([pad]) * pad
         else:
             raise Exception('Bad data type for plaintext variable')
@@ -99,7 +99,7 @@ class PaddingOracle(object):
                                            **kwargs)
 
             block = xor(intermediate_bytes,
-                        plaintext[n - block_size * 2:n + block_size]) # minus?
+                        plaintext[n - block_size * 2:n + block_size])
 
             encrypted = block + encrypted
 
@@ -120,8 +120,8 @@ class PaddingOracle(object):
         '''
         if isinstance(ciphertext, str):
             ciphertext = ciphertext.encode()
-        elif not isinstance(ciphertext, bytes):
-            raise Exception
+        elif not isinstance(ciphertext, (bytes, bytearray)):
+            raise Exception('Bad data type for ciphertext variable')
 
         self.log.debug('Attempting to decrypt %r bytes', str(ciphertext))
 
