@@ -1,6 +1,8 @@
 python-paddingoracle: A portable, padding oracle exploit API
 ============================================================
 
+UPDATED FOR PYTHON 3
+
 python-paddingoracle is an API that provides pentesters a customizable
 alternative to `PadBuster`_ and other padding oracle exploit tools that can't
 easily (without a heavy rewrite) be used in unique, per-app scenarios. Think
@@ -18,7 +20,7 @@ See below for an example (from `the example`_): ::
 
     from paddingoracle import BadPaddingException, PaddingOracle
     from base64 import b64encode, b64decode
-    from urllib import quote, unquote
+    from urllib.parse import quote, unquote
     import requests
     import socket
     import time
@@ -58,7 +60,7 @@ See below for an example (from `the example`_): ::
         import sys
 
         if not sys.argv[1:]:
-            print 'Usage: %s <somecookie value>' % (sys.argv[0], )
+            print('Usage: %s <somecookie value>' % (sys.argv[0], ))
             sys.exit(1)
 
         logging.basicConfig(level=logging.DEBUG)
